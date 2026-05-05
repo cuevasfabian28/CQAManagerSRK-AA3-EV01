@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CQA Manager SRK - Topografia</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f4f6f9; }
+
+        .navbar {
+            background: #0f3460;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 { font-size: 20px; }
+        .navbar a { color: white; text-decoration: none; margin-left: 15px; font-size: 14px; }
+
+        .container { display: flex; min-height: calc(100vh - 60px); }
+
+        .sidebar { width: 220px; background: #16213e; padding: 20px 0; }
+        .sidebar a { display: block; color: #ccc; text-decoration: none; padding: 12px 20px; font-size: 14px; }
+        .sidebar a:hover { background: #0f3460; color: white; }
+        .sidebar .menu-title { color: #666; font-size: 11px; padding: 15px 20px 5px; text-transform: uppercase; }
+
+        .main-content { flex: 1; padding: 30px; }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 10px;
+        }
+        .page-header h2 { color: #0f3460; font-size: 22px; }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+        }
+        .btn-primary { background: #0f3460; color: white; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn:hover { opacity: 0.85; }
+
+        .table-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #0f3460; color: white; padding: 12px; text-align: left; font-size: 13px; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+        tr:hover { background: #f8f9fa; }
+
+        .alert-success {
+            background: #d4edda; color: #155724;
+            padding: 10px 15px; border-radius: 5px; margin-bottom: 20px;
+        }
+        .alert-error {
+            background: #f8d7da; color: #721c24;
+            padding: 10px 15px; border-radius: 5px; margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Barra de navegacion -->
+<div class="navbar">
+    <h1>⛏️ CQA Manager SRK</h1>
+    <div>
+        <a th:href="@{/dashboard}">Dashboard</a>
+        <a th:href="@{/auth/logout}">Cerrar Sesion</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Menu lateral -->
+    <div class="sidebar">
+        <div class="menu-title">Menu Principal</div>
+        <a th:href="@{/dashboard}">🏠 Dashboard</a>
+        <div class="menu-title">Laboratorio</div>
+        <a th:href="@{/ensayo/lista}">🔬 Ensayos</a>
+        <a th:href="@{/ensayo/nuevo}">➕ Nuevo Ensayo</a>
+        <div class="menu-title">Topografia</div>
+        <a th:href="@{/topografia/lista}">📍 Levantamientos</a>
+        <a th:href="@{/topografia/nuevo}">➕ Nuevo Levantamiento</a>
+        <div class="menu-title">Supervision</div>
+        <a th:href="@{/liberacion/lista}">✅ Liberaciones</a>
+        <a th:href="@{/liberacion/nuevo}">➕ Nueva Liberacion</a>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="main-content">
+
+        <div class="page-header">
+            <h2>📍 Levantamientos Topograficos</h2>
+            <a th:href="@{/topografia/nuevo}" class="btn btn-primary">
+                ➕ Nuevo Levantamiento
+            </a>
+        </div>
+
+        <!-- Mensajes -->
+        <div class="alert-success" th:if="${mensaje}" th:text="${mensaje}"></div>
+        <div class="alert-error" th:if="${error}" th:text="${error}"></div>
+
+        <!-- Tabla de levantamientos -->
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Estructura</th>
+                        <th>Area (m²)</th>
+                        <th>Volumen (m³)</th>
+                        <th>Responsable</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="dato : ${topografias}">
+                        <td th:text="${dato.idDatoTopografico}"></td>
+                        <td th:text="${dato.fecha}"></td>
+                        <td th:text="${dato.estructura.nombreEstructura}"></td>
+                        <td th:text="${dato.area}"></td>
+                        <td th:text="${dato.volumen}"></td>
+                        <td th:text="${dato.usuario.nombre}"></td>
+                        <td>
+                            <a th:href="@{/topografia/detalle/{id}(id=${dato.idDatoTopografico})}"
+                               class="btn btn-primary">Ver</a>
+                            <a th:href="@{/topografia/editar/{id}(id=${dato.idDatoTopografico})}"
+                               class="btn btn-warning">Editar</a>
+                            <a th:href="@{/topografia/eliminar/{id}(id=${dato.idDatoTopografico})}"
+                               class="btn btn-danger"
+                               onclick="return confirm('¿Desea eliminar este levantamiento?')">
+                               Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(topografias)}">
+                        <td colspan="7" style="text-align:center; color:#666; padding:20px;">
+                            No hay levantamientos registrados. ¡Crea el primero!
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
